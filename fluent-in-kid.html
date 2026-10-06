@@ -1,0 +1,850 @@
+<title>Fluent in Kid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a pocket phrasebook. Cobalt cover band, then a "who's reading" setup strip, then tabbed sections (Decoder, Phrasebook, Pop quiz, Notes). */
+:root {
+  --paper: #F4F5FA;
+  --surface: #FFFFFF;
+  --ink: #141A33;
+  --muted: #586079;
+  --line: #D9DCEA;
+  --soft: #E9ECFA;
+  --cobalt: #2B44D6;
+  --on-cobalt: #FFFFFF;
+  --cover-bg: #2B44D6;
+  --cover-fg: #FFE14D;
+  --cover-sub: #DCE2FF;
+  --mark: rgba(255, 221, 64, .8);
+  --go: #1C7A4B;
+  --maybe: #A75A06;
+  --no: #BF2D38;
+  --alert-bg: #FFF2E2;
+  --alert-line: #F1C38A;
+  --font-display: "Archivo", "Arial Black", "Helvetica Neue", sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1222; --surface: #161B30; --ink: #E8EBF7; --muted: #9AA2C0; --line: #2A3152; --soft: #1D2442;
+    --cobalt: #8397FF; --on-cobalt: #0E1222; --cover-bg: #1B2A92; --cover-fg: #FFE14D; --cover-sub: #C3CCFF;
+    --mark: rgba(232, 201, 58, .3); --go: #5CC690; --maybe: #F0A54A; --no: #FF7C85;
+    --alert-bg: #2A2115; --alert-line: #6B4A1F; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1222; --surface: #161B30; --ink: #E8EBF7; --muted: #9AA2C0; --line: #2A3152; --soft: #1D2442;
+  --cobalt: #8397FF; --on-cobalt: #0E1222; --cover-bg: #1B2A92; --cover-fg: #FFE14D; --cover-sub: #C3CCFF;
+  --mark: rgba(232, 201, 58, .3); --go: #5CC690; --maybe: #F0A54A; --no: #FF7C85;
+  --alert-bg: #2A2115; --alert-line: #6B4A1F; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; }
+@media (min-width: 700px) { .wrap { padding-inline: 28px; } }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.1; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+
+/* Cover */
+.cover { background: var(--cover-bg); color: var(--cover-sub); }
+.cover .wrap { padding-block: 28px 30px; display: grid; gap: 10px; }
+.cover .edition { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--cover-sub); }
+.cover h1 { color: var(--cover-fg); font-size: clamp(42px, 9vw, 84px); font-weight: 900; font-stretch: 125%; letter-spacing: -.02em; }
+.cover p { margin: 0; max-width: 46ch; font-size: 18px; }
+
+/* Setup */
+.setup { border-bottom: 1px solid var(--line); background: var(--surface); }
+.setup .wrap { padding-block: 18px; display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .setup .wrap { grid-template-columns: 1fr 1fr; gap: 28px; } }
+.pick { display: grid; gap: 8px; min-width: 0; }
+.pick-label { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; cursor: pointer; display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.2; text-align: left; }
+.chip b { font-size: 16px; }
+.chip small { font-size: 12.5px; color: var(--muted); }
+.chip:hover { border-color: var(--cobalt); }
+.chip[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+.chip[aria-pressed="true"] small { color: var(--on-cobalt); opacity: .85; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 2px solid var(--line); margin-top: 22px; scrollbar-width: none; }
+.tab { border: 0; background: none; padding: 10px 14px; font-family: var(--font-display); font-stretch: 112%; font-weight: 700; font-size: 16px; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--cobalt); }
+.panel { padding-block: 24px 56px; }
+.lede { color: var(--muted); max-width: 62ch; margin: 6px 0 18px; }
+.panel h2 { font-size: clamp(24px, 4vw, 32px); font-weight: 800; font-stretch: 112%; }
+
+/* Decoder */
+.decoder { display: grid; gap: 14px; }
+textarea#said { width: 100%; min-height: 96px; resize: vertical; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: var(--r); background: var(--surface); font-size: 19px; }
+textarea#said:focus { border-color: var(--cobalt); outline: none; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { border: 1.5px solid var(--cobalt); background: var(--cobalt); color: var(--on-cobalt); border-radius: 999px; padding: 9px 18px; font-weight: 700; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--cobalt); }
+.btn:disabled { opacity: .5; cursor: default; }
+.samples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.samples button { border: 1px dashed var(--line); background: none; border-radius: 6px; padding: 4px 9px; font-size: 14px; color: var(--muted); cursor: pointer; }
+.samples button:hover { color: var(--ink); border-color: var(--cobalt); }
+.out { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.heard { font-size: 20px; line-height: 1.6; overflow-wrap: anywhere; }
+.heard mark { background: linear-gradient(transparent 45%, var(--mark) 45%); color: inherit; padding: 0 2px; cursor: pointer; border-radius: 2px; }
+.found { display: grid; gap: 10px; }
+.found-item { display: grid; grid-template-columns: minmax(90px, 160px) 1fr; gap: 4px 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+@media (max-width: 520px) { .found-item { grid-template-columns: 1fr; } }
+.found-item .t { font-family: var(--font-display); font-weight: 800; font-stretch: 112%; font-size: 18px; }
+.found-item p { margin: 0; min-width: 0; }
+.found-item .eq { color: var(--muted); }
+.nothing { color: var(--muted); margin: 0; }
+.ai { border-top: 2px solid var(--ink); padding-top: 14px; display: grid; gap: 10px; }
+.ai-text { white-space: pre-wrap; margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ai-text .lbl { display: inline-block; font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; color: var(--cobalt); margin-top: 6px; }
+.small { font-size: 14px; color: var(--muted); }
+
+/* Phrasebook */
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.tools input[type="search"] { flex: 1 1 240px; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); }
+.filter { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-size: 15px; }
+.filter[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.count { color: var(--muted); font-size: 14px; }
+.banner { background: var(--soft); border-radius: var(--r); padding: 14px 16px; margin-bottom: 16px; }
+.banner b { font-family: var(--font-display); font-stretch: 112%; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 14px; align-items: start; }
+.entry { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 9px; min-width: 0; }
+.entry-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.entry h3 { font-size: 26px; font-weight: 800; font-stretch: 118%; letter-spacing: -.01em; }
+.pron { font-style: italic; color: var(--muted); }
+.pos { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.pill { margin-left: auto; font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.pill.fresh { background: var(--cover-fg); color: #141A33; }
+.pill.hot { background: var(--cobalt); color: var(--on-cobalt); }
+.pill.fading { background: var(--soft); color: var(--muted); }
+.pill.retired { border: 1px solid var(--line); color: var(--muted); text-decoration: line-through; }
+.entry p { margin: 0; }
+.says { font-style: italic; padding-left: 12px; border-left: 3px solid var(--line); }
+.then .k { display: block; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.then span.v { background: linear-gradient(transparent 50%, var(--mark) 50%); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.fit { font-size: 14px; color: var(--muted); }
+.meter { display: flex; align-items: flex-start; gap: 8px; font-size: 14.5px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.dot { flex: none; width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; }
+.meter.go .dot { background: var(--go); } .meter.go b { color: var(--go); }
+.meter.maybe .dot { background: var(--maybe); } .meter.maybe b { color: var(--maybe); }
+.meter.no .dot { background: var(--no); } .meter.no b { color: var(--no); }
+.alert { background: var(--alert-bg); border: 1px solid var(--alert-line); border-radius: 8px; padding: 9px 12px; font-size: 14.5px; }
+.alert b { color: var(--maybe); }
+.empty { color: var(--muted); padding: 30px 0; }
+
+/* Quiz */
+.quiz { max-width: 640px; display: grid; gap: 16px; }
+.qbar { display: flex; justify-content: space-between; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 14px; }
+.qcard .q { font-size: 15px; color: var(--muted); }
+.qcard .qt { font-family: var(--font-display); font-weight: 900; font-stretch: 125%; font-size: clamp(32px, 7vw, 46px); line-height: 1; }
+.qcard .qs { font-style: italic; }
+.opts { display: grid; gap: 8px; }
+.opt { text-align: left; border: 1.5px solid var(--line); background: var(--paper); border-radius: 8px; padding: 11px 14px; cursor: pointer; }
+.opt:hover:not(:disabled) { border-color: var(--cobalt); }
+.opt.right { border-color: var(--go); background: color-mix(in srgb, var(--go) 12%, var(--surface)); }
+.opt.wrong { border-color: var(--no); background: color-mix(in srgb, var(--no) 10%, var(--surface)); }
+.opt:disabled { cursor: default; }
+.score { font-family: var(--font-display); font-weight: 900; font-stretch: 125%; font-size: 56px; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* Notes */
+.notes-form { display: grid; gap: 10px; grid-template-columns: 1fr; max-width: 720px; }
+@media (min-width: 640px) { .notes-form { grid-template-columns: 1fr 2fr auto; align-items: end; } }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-size: 14px; color: var(--muted); }
+.field input { padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); width: 100%; }
+.notes { display: grid; gap: 8px; margin-top: 18px; max-width: 720px; }
+.note { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.note b { font-family: var(--font-display); font-stretch: 112%; font-size: 18px; }
+.note span { flex: 1 1 200px; min-width: 0; color: var(--muted); }
+.note .acts { display: flex; gap: 6px; }
+.linkbtn { border: 0; background: none; color: var(--cobalt); cursor: pointer; padding: 2px 4px; font-size: 14px; font-weight: 700; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 18px 28px; color: var(--muted); font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .entry, .out { animation: rise .25s ease-out both; }
+  @keyframes rise { from { transform: translateY(4px); } to { transform: none; } }
+}
+</style>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="edition mono"><span>Pocket phrasebook</span><span>2026 edition</span><span>With pronunciation guide</span></div>
+    <h1>Fluent in Kid</h1>
+    <p>For parents visiting the strange country down the hall. Pick your generation and your kid's, and every word gets explained in slang you already know.</p>
+  </div>
+</header>
+
+<section class="setup" aria-label="Who's reading">
+  <div class="wrap">
+    <div class="pick">
+      <span class="pick-label mono">I grew up as a</span>
+      <div class="chips" id="parentChips" role="group" aria-label="Your generation"></div>
+    </div>
+    <div class="pick">
+      <span class="pick-label mono">My kid is</span>
+      <div class="chips" id="kidChips" role="group" aria-label="Your kid's generation"></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-decode" aria-controls="p-decode" data-tab="decode">Decoder</button>
+    <button class="tab" role="tab" id="tab-book" aria-controls="p-book" data-tab="book">Phrasebook</button>
+    <button class="tab" role="tab" id="tab-quiz" aria-controls="p-quiz" data-tab="quiz">Pop quiz</button>
+    <button class="tab" role="tab" id="tab-notes" aria-controls="p-notes" data-tab="notes">Words I heard</button>
+  </div>
+
+  <section class="panel" role="tabpanel" id="p-decode" aria-labelledby="tab-decode">
+    <h2>What did they just say?</h2>
+    <p class="lede">Type or paste what your kid said, a text they sent, or a single word. Slang lights up and gets translated into your generation's terms.</p>
+    <div class="decoder">
+      <textarea id="said" aria-label="What your kid said"></textarea>
+      <div class="samples" id="samples"><span class="small">Try:</span></div>
+      <div class="row">
+        <button class="btn" id="decodeBtn">Decode</button>
+        <button class="btn ghost" id="askBtn" hidden>Ask Claude for a full translation</button>
+        <button class="btn ghost" id="stopBtn" hidden>Stop</button>
+      </div>
+      <div class="out" id="out"></div>
+    </div>
+  </section>
+
+  <section class="panel" role="tabpanel" id="p-book" aria-labelledby="tab-book" hidden>
+    <h2>The phrasebook</h2>
+    <p class="lede">Every entry: what it means, how your kid uses it, what you'd have said instead, and whether you should ever say it out loud.</p>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Search a word or meaning…" aria-label="Search the phrasebook">
+      <button class="filter" data-f="all" aria-pressed="true">All</button>
+      <button class="filter" data-f="fresh" aria-pressed="false">New this year</button>
+      <button class="filter" data-f="alert" aria-pressed="false">Heads-up words</button>
+      <button class="filter" data-f="safe" aria-pressed="false">Safe for you to say</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div id="eraBanner"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="panel" role="tabpanel" id="p-quiz" aria-labelledby="tab-quiz" hidden>
+    <h2>Pop quiz</h2>
+    <p class="lede">Five words from your kid's generation. Find out if you're fluent or just unc.</p>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <section class="panel" role="tabpanel" id="p-notes" aria-labelledby="tab-notes" hidden>
+    <h2>Words I heard</h2>
+    <p class="lede">Slang changes every few months. When you hear something new at dinner or in the car, jot it down here and decode it later. Notes stay in this browser only.</p>
+    <form class="notes-form" id="noteForm">
+      <div class="field"><label for="nt">The word</label><input id="nt" required maxlength="60" placeholder="e.g. huzz"></div>
+      <div class="field"><label for="nm">Where you heard it / your guess</label><input id="nm" maxlength="200" placeholder="Said it about the new kid at school"></div>
+      <button class="btn" type="submit">Save it</button>
+    </form>
+    <div class="notes" id="notes"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Slang moves fast. Entries reflect usage through 2025–26; by the time you've heard of a word, it's probably on its way out. Generations use common Pew Research birth-year ranges.</div>
+</footer>
+
+<script>
+const GENS = {
+  b: { name: "Boomer", yrs: "born 1946–64", teen: "1965", lead: "Back in your day" },
+  x: { name: "Gen X", yrs: "born 1965–80", teen: "1988", lead: "In 1988 terms" },
+  m: { name: "Millennial", yrs: "born 1981–96", teen: "2010", lead: "Circa 2012" },
+  z: { name: "Gen Z", yrs: "born 1997–2012", teen: "2018", lead: "In your own slang" }
+};
+const KIDS = {
+  z: { name: "Gen Z", yrs: "born 1997–2012", age: "teens & 20s" },
+  a: { name: "Gen Alpha", yrs: "born 2013–24", age: "ages 2–13" },
+  beta: { name: "Gen Beta", yrs: "born 2025+", age: "babies" }
+};
+const STATUS = { fresh: "New 2025–26", hot: "Everywhere now", fading: "Fading", retired: "Retired" };
+const USE = { go: "Safe to say.", maybe: "Use once, ironically.", no: "Don't." };
+
+// who: which kid generation uses it most. z = Gen Z, a = Gen Alpha, za = both.
+// eq: the closest thing from each parent generation's youth. A missing eq.z means Gen Z coined it.
+const TERMS = [
+  { t: "rizz", p: "riz", pos: "n. / v.", who: "za", st: "fading", k: ["rizz", "rizzed", "rizzing", "rizzler", "rizz up", "w rizz", "l rizz"],
+    s: "Charm; the ability to flirt", m: "Charm, especially flirting skill. “Rizz someone up” means to flirt with them. Short for charisma. Oxford's Word of the Year in 2023.",
+    ex: "He's got zero rizz, he just stared at her and said “nice backpack.”",
+    eq: { b: "Being smooth, having “a good line”", x: "Having game. A smooth operator.", m: "Having mad game or swag" },
+    use: "maybe", un: "A parent saying “rizz” is a known comedy bit. Deploy once for maximum groans." },
+  { t: "no cap", p: "noh kap", pos: "phr.", who: "za", st: "fading", k: ["no cap", "cap", "capping", "🧢"],
+    s: "No lie; for real", m: "No lie, I'm serious. “Cap” on its own means a lie, and “that's cap” means that's not true. The 🧢 emoji means the same.",
+    ex: "This is the best pizza I've ever had, no cap.",
+    eq: { b: "Honest to God. Scout's honor.", x: "For real. Swear to God.", m: "Legit. For reals, I'm not even kidding." },
+    use: "maybe", un: "Mostly harmless, mostly cringe." },
+  { t: "bet", p: "bet", pos: "interj.", who: "za", st: "hot", k: ["bet"],
+    s: "Okay, deal, sounds good", m: "Okay, deal, sounds good. A one-word yes.",
+    ex: "“Pick you up at six?” “Bet.”",
+    eq: { b: "Right on. You got it.", x: "Word. Cool beans.", m: "Sounds legit. Totes." },
+    use: "go", un: "Short and low-cringe. One of the best ones to use back." },
+  { t: "slay", p: "slay", pos: "v.", who: "za", st: "fading", k: ["slay", "slayed", "slaying", "slays", "ate that", "left no crumbs", "ate and left no crumbs"],
+    s: "Did something extremely well", m: "Did something extremely well, or looked amazing. “Ate” and “ate and left no crumbs” mean the same: nailed it.",
+    ex: "Your outfit for the dance? You ate. No crumbs.",
+    eq: { b: "She was a knockout. Outta sight.", x: "You totally killed it. Bodacious.", m: "Nailed it. On fleek. Yasss, queen." },
+    use: "maybe", un: "Kids say parents have “ruined” it. That may be the goal." },
+  { t: "it's giving", p: "its GIV-ing", pos: "phr.", who: "za", st: "fading", k: ["it's giving", "its giving"],
+    s: "It has the vibe of…", m: "It has the vibe of something. Often left unfinished: “It's giving.” on its own means it's giving something good.",
+    ex: "This lamp is giving haunted Victorian child.",
+    eq: { b: "It's got a real ___ feel to it.", x: "It's so ___. Very ___.", m: "Serious ___ vibes." },
+    use: "maybe", un: "Works best when you finish the sentence with something specific and weird." },
+  { t: "mid", p: "mid", pos: "adj.", who: "za", st: "hot", k: ["mid"],
+    s: "Mediocre, overrated", m: "Mediocre, average, overrated. A put-down, not a compliment.",
+    ex: "Everyone hyped the movie but it was mid.",
+    eq: { b: "So-so. Nothing to write home about.", x: "Lame. Bogus.", m: "Meh. Basic." },
+    use: "go", un: "Useful for reviewing dinner they didn't like." },
+  { t: "bussin'", p: "BUS-in", pos: "adj.", who: "za", st: "fading", k: ["bussin", "bussin'", "bussing"],
+    s: "Really good (usually food)", m: "Extremely good, usually about food. From Black American slang.",
+    ex: "Grandma's mac and cheese is bussin'.",
+    eq: { b: "Out of this world.", x: "Totally awesome. Primo.", m: "Bomb. Amazeballs." },
+    use: "maybe", un: "Allowed only when complimenting their cooking." },
+  { t: "sus", p: "suss", pos: "adj.", who: "za", st: "fading", k: ["sus", "suspect"],
+    s: "Suspicious, shady", m: "Suspicious or shady. Popularized by the game Among Us.",
+    ex: "You cleaned your room without being asked? Kinda sus.",
+    eq: { b: "Fishy. Something smells funny.", x: "Sketchy.", m: "Shady. Sketch." },
+    use: "go", un: "Fine. Even teachers say it now." },
+  { t: "lowkey", p: "LOH-kee", pos: "adv.", who: "za", st: "hot", k: ["lowkey", "low key", "low-key", "highkey", "high key", "high-key"],
+    s: "Kind of, secretly", m: "“Lowkey” means kind of, quietly, or secretly. “Highkey” means very, or openly.",
+    ex: "I lowkey want to stay home tonight.",
+    eq: { b: "Kinda. On the QT.", x: "Sorta. Totally (that's highkey).", m: "You said this too. It's been around since about 2015." },
+    use: "go", un: "Old enough that you can get away with it." },
+  { t: "cooked", p: "kukt", pos: "adj.", who: "za", st: "hot", k: ["cooked", "we're cooked", "im cooked", "i'm cooked"],
+    s: "Doomed, done for", m: "Done for, in big trouble, or exhausted. “We're cooked” means we're doomed. Not to be confused with “let him cook.”",
+    ex: "Test is tomorrow and I didn't study. I'm cooked.",
+    eq: { b: "Up the creek. You're toast.", x: "Hosed. Dead meat.", m: "Epic fail. RIP me." },
+    use: "go", un: "Accurate and funny when the car breaks down." },
+  { t: "let him cook", p: "let him kuk", pos: "phr.", who: "za", st: "fading", k: ["let him cook", "let her cook", "let them cook", "let me cook"],
+    s: "Let them keep going; they're onto something", m: "Let them keep going, they're onto something good. Said when someone's idea looks strange at first.",
+    ex: "He's putting ketchup on the waffle. Let him cook.",
+    eq: { b: "Let him run with it.", x: "Let him do his thing.", m: "Let him do him." },
+    use: "go", un: "Great for encouraging a kid's weird science project." },
+  { t: "W / L", p: "dub-ul-yoo / el", pos: "n.", who: "za", st: "hot", k: ["take the l", "took the l", "took an l", "that's an l", "that's a w", "big w", "huge w", "massive w", "big l", "huge l", "massive l"],
+    s: "A win / a loss", m: "W means win, L means loss. “Take the L” means accept defeat. Said about anything from grades to lunch.",
+    ex: "No homework this weekend? Huge W.",
+    eq: { b: "Score one for us. What a bummer.", x: "Score! Or the “L on your forehead” loser sign.", m: "Winning! Fail." },
+    use: "go", un: "Kids won't even notice. It's that common." },
+  { t: "GOAT", p: "goht", pos: "n. / adj.", who: "za", st: "fading", k: ["goat", "goated", "the goat"],
+    s: "Greatest of all time", m: "Greatest Of All Time. “Goated” means extremely good at something.",
+    ex: "Mr. Patel is the goat, he canceled the quiz.",
+    eq: { b: "The greatest, like Ali.", x: "The king. The man.", m: "A legend. Boss." },
+    use: "go", un: "Sports dads have used it for years. Safe." },
+  { t: "delulu", p: "deh-LOO-loo", pos: "adj.", who: "za", st: "fading", k: ["delulu", "delulu is the solulu"],
+    s: "Delusional (usually about a crush)", m: "Delusional, often about a crush or a big dream. “Delulu is the solulu” is ironic optimism: believe anyway.",
+    ex: "I'm delulu enough to think he'll text back.",
+    eq: { b: "Head in the clouds. A pipe dream.", x: "Dream on. As if!", m: "Living in a fantasy." },
+    use: "maybe", un: "Only if you're laughing at yourself." },
+  { t: "the ick", p: "ik", pos: "n.", who: "z", st: "fading", k: ["the ick", "ick", "icks"],
+    s: "A sudden turn-off", m: "A sudden turn-off about someone, often over something tiny.",
+    ex: "He chewed with his mouth open and I got the ick.",
+    eq: { b: "Gives me the creeps.", x: "Gag me with a spoon.", m: "A total dealbreaker." },
+    use: "go", un: "Harmless. Just don't say you got the ick from their boyfriend." },
+  { t: "situationship", p: "sich-oo-AY-shun-ship", pos: "n.", who: "z", st: "hot", k: ["situationship", "situationships"],
+    s: "Romance with no label", m: "A romantic relationship with no official label. More than friends, less than dating.",
+    ex: "We're not dating, it's a situationship.",
+    eq: { b: "Going steady, but without the pin.", x: "Hooking up, but not “going out.”", m: "Facebook status: It's complicated." },
+    use: "go", un: "Useful vocabulary. Ask how the situationship is going at your own risk." },
+  { t: "main character", p: "mayn KAIR-ik-ter", pos: "n.", who: "za", st: "fading", k: ["main character", "main character energy", "main character syndrome"],
+    s: "Acting like the star of the movie", m: "Acting like you're the star of the movie. Can be praise (confident) or an insult (self-centered).",
+    ex: "Walking into school with sunglasses on? Main character energy.",
+    eq: { b: "Who does she think she is, Elizabeth Taylor?", x: "A total diva. Very Ferris Bueller.", m: "Living your best life." },
+    use: "go", un: "Fine to use. Kids might even agree." },
+  { t: "NPC", p: "en-pee-see", pos: "n.", who: "za", st: "hot", k: ["npc", "npcs"],
+    s: "A mindless follower", m: "Non-Player Character, the background people in a video game. Means someone with no original thoughts who just goes along.",
+    ex: "Everyone bought the same jacket, they're such NPCs.",
+    eq: { b: "A square. A company man. Sheep.", x: "A drone. A mall zombie.", m: "Basic. Sheeple." },
+    use: "go", un: "Fine. Just don't call their friends this." },
+  { t: "touch grass", p: "tuch gras", pos: "phr.", who: "za", st: "hot", k: ["touch grass", "go touch grass", "touching grass"],
+    s: "Go outside; you're too online", m: "Go outside, you've been online too long and lost perspective.",
+    ex: "You've been arguing about a video game for three hours. Touch grass.",
+    eq: { b: "Go play outside and get some fresh air.", x: "Get a life.", m: "Unplug for a bit." },
+    use: "go", un: "Probably the most useful phrase in this book for parents." },
+  { t: "ratio", p: "RAY-shee-oh", pos: "n. / v.", who: "z", st: "fading", k: ["ratio", "ratioed", "ratio'd"],
+    s: "Getting out-liked by a reply", m: "When a reply gets more likes than the original post, meaning people side with the reply. “Got ratioed” means publicly outvoted.",
+    ex: "The principal posted about the dress code and got ratioed.",
+    eq: { b: "Booed off the stage.", x: "Burned! Oh, snap.", m: "Owned. Pwned." },
+    use: "maybe", un: "You'd have to know what it means first. Now you do." },
+  { t: "caught in 4K", p: "kawt in for-kay", pos: "phr.", who: "za", st: "fading", k: ["caught in 4k", "in 4k"],
+    s: "Caught red-handed with proof", m: "Caught red-handed, with undeniable proof (as if on a high-definition 4K camera).",
+    ex: "He said he was at practice but he got caught in 4K at the mall.",
+    eq: { b: "Caught with your hand in the cookie jar.", x: "Busted!", m: "Pics or it didn't happen, and there were pics." },
+    use: "go", un: "Excellent for when the doorbell camera saw everything." },
+  { t: "it's sending me / 💀", p: "SEN-ding mee", pos: "phr.", who: "za", st: "hot", k: ["sending me", "it's sending me", "i'm dead", "im dead", "dead", "dying", "💀", "😭"],
+    s: "That's hilarious", m: "That's hilarious. “I'm dead,” “dying,” 💀 (skull) and 😭 (crying) all mean laughing hard, not death or sadness.",
+    ex: "Your dad trying to dance 💀💀💀",
+    eq: { b: "That cracks me up. I'm in stitches.", x: "ROTFL. That's a riot.", m: "I can't even. Dying. LOL." },
+    use: "go", un: "Worth knowing so a skull emoji doesn't worry you." },
+  { t: "spill the tea", p: "spil thuh tee", pos: "phr.", who: "z", st: "fading", k: ["spill the tea", "what's the tea", "the tea", "spill"],
+    s: "Share the gossip", m: "“Tea” is gossip. “Spill the tea” means tell me everything.",
+    ex: "Wait, they broke up? Spill the tea.",
+    eq: { b: "Dish the dirt.", x: "Dish! What's the 411?", m: "You were saying this already in 2016." },
+    use: "go", un: "Older slang, borrowed from drag culture. Safe." },
+  { t: "unc", p: "unk", pos: "n.", who: "za", st: "fresh", k: ["unc", "unc status", "unc behavior", "uncs"],
+    s: "Someone acting old", m: "Short for uncle: someone acting old or out of touch. Often affectionate. “Unc status” means you've aged into it. If you're reading this, you are unc.",
+    ex: "He fell asleep at 9pm on a Saturday. Unc behavior.",
+    eq: { b: "The old man. Pops.", x: "Grandpa. Old fogey.", m: "The “OK boomer” of the 2020s, now aimed at you.", z: "Yes, even you. The 2025 kids made it official." },
+    use: "go", un: "Lean in. Calling yourself unc first takes away its power." },
+  { t: "aura", p: "OR-uh", pos: "n.", who: "za", st: "fresh", k: ["aura", "aura points", "aura farming", "aura farm", "-1000 aura", "minus aura", "plus aura"],
+    s: "Your cool factor", m: "Your cool factor. You gain or lose “aura points” for what you do. “Aura farming” means deliberately acting cool to collect it, a 2025 trend.",
+    ex: "Tripping in front of the whole class was minus 1000 aura.",
+    eq: { b: "Cool factor. Steve McQueen had it.", x: "Street cred. Fonzie cool.", m: "Clout. Swag.", z: "Clout, but spiritual." },
+    use: "maybe", un: "Telling your kid they lost aura is a power move." },
+  { t: "6-7", p: "six SEV-en", pos: "interj.", who: "a", st: "fresh", k: ["6-7", "6 7", "67", "six seven", "six-seven", "sixseven"],
+    s: "A nonsense meme with a hand gesture", m: "A nonsense phrase shouted for laughs, usually with a palms-up, weighing-it-up hand motion. From the song “Doot Doot (6 7)” by Skrilla and basketball videos. It doesn't really mean anything. That's the joke. Dictionary.com's Word of the Year for 2025.",
+    ex: "“What page are we on?” “Sixty-se—” “SIX SEVENNN.”",
+    eq: { b: "Like “Would you believe…?” from Get Smart, repeated forever.", x: "Like yelling “Where's the beef?” or “Eat my shorts!”", m: "Like shouting “Harambe” for no reason.", z: "Like skibidi: the point is that there's no point." },
+    use: "no", un: "Saying it will make your kid physically leave the room. Possibly worth it." },
+  { t: "skibidi", p: "SKIB-ih-dee", pos: "adj.", who: "a", st: "fading", k: ["skibidi", "skibidi toilet"],
+    s: "Nonsense word from a toilet video", m: "From the YouTube series Skibidi Toilet (singing heads in toilets). Used as a nonsense word meaning cool, bad, or weird depending on the moment.",
+    ex: "That's so skibidi.",
+    eq: { b: "Supercalifragilisticexpialidocious-level nonsense.", x: "Like yelling “Cowabunga!”", m: "Rickroll-level nonsense.", z: "Your little siblings' version of “yeet.”" },
+    use: "no", un: "No adult has ever said this correctly." },
+  { t: "brainrot", p: "BRAYN-rot", pos: "n.", who: "za", st: "hot", k: ["brainrot", "brain rot", "brainrotted"],
+    s: "Fried-brain internet junk", m: "Absurd, low-quality internet content, and the fried feeling from watching too much of it. Oxford's Word of the Year in 2024. Kids use it about themselves.",
+    ex: "I watched TikTok for four hours, I have actual brainrot.",
+    eq: { b: "“Too much TV will rot your brain.” Your parents said it too.", x: "Couch-potato MTV brain.", m: "Falling down a YouTube rabbit hole." },
+    use: "go", un: "Kids already know. Saying it is fair game." },
+  { t: "Italian brainrot", p: "ih-TAL-yun BRAYN-rot", pos: "n.", who: "a", st: "fading", k: ["italian brainrot", "tralalero", "tralalero tralala", "tung tung tung sahur", "tung tung", "ballerina cappuccina", "bombardiro crocodilo"],
+    s: "AI cartoon characters with fake-Italian names", m: "A 2025 craze of AI-generated surreal creatures with fake-Italian names: Tralalero Tralala (a shark in sneakers), Tung Tung Tung Sahur (a wooden log with a bat), Ballerina Cappuccina, Bombardiro Crocodilo. Kids quote and collect them.",
+    ex: "Tung tung tung tung SAHUR!",
+    eq: { b: "Like collecting Wacky Packages stickers.", x: "Garbage Pail Kids.", m: "Beanie Babies-level obsession, but sharks in Nikes.", z: "Weirder than anything on Vine." },
+    use: "maybe", un: "Knowing even one character's name earns real points." },
+  { t: "sigma", p: "SIG-muh", pos: "n. / adj.", who: "a", st: "fading", k: ["sigma", "sigma male", "sigmas"],
+    s: "A cool lone wolf", m: "A supposedly top-tier “lone wolf” guy who plays by his own rules. Younger kids mostly use it as a joke word for cool.",
+    ex: "He ate lunch alone and read a book. Sigma.",
+    eq: { b: "A lone wolf. The Marlboro Man.", x: "Bender from The Breakfast Club.", m: "An alpha. A lone wolf.", z: "Your “alpha male” memes, recycled." },
+    use: "no", un: "Very cringe from a parent.",
+    warn: "Comes from online “alpha male” culture. For most kids it's just a joke, but if they're quoting manosphere influencers seriously, it's worth a conversation." },
+  { t: "mog", p: "mog", pos: "v.", who: "za", st: "hot", k: ["mog", "mogged", "mogging", "mogs"],
+    s: "To outshine someone in looks", m: "To outshine someone, especially in looks or presence. “He got mogged” means someone more impressive stood next to him.",
+    ex: "Bro got mogged by his own little brother.",
+    eq: { b: "Upstaged.", x: "Showed him up.", m: "Stole the spotlight.", z: "Came from the looksmaxxing forums you scrolled past." },
+    use: "maybe", un: "Fine in a jokey way.",
+    warn: "Comes from looksmaxxing forums that rank people's faces. Usually just banter, but watch for it alongside appearance anxiety." },
+  { t: "-maxxing", p: "MAKS-ing", pos: "suffix", who: "za", st: "hot", k: ["looksmaxxing", "looksmaxing", "sleepmaxxing", "maxxing", "mewing", "mew"],
+    s: "Optimizing something to the max", m: "Maximizing something: “sleepmaxxing” is optimizing sleep, “looksmaxxing” is maximizing your looks. “Mewing” is pressing your tongue to the roof of your mouth for a sharper jaw; kids make a shushing jaw gesture meaning “can't talk, I'm mewing.”",
+    ex: "I'm sleepmaxxing tonight, phone off at ten.",
+    eq: { b: "Charles Atlas ads: don't get sand kicked in your face.", x: "The Thighmaster era.", m: "Contouring tutorials and “life hacks.”" },
+    use: "maybe", un: "“Homeworkmaxxing” is a fair try.",
+    warn: "Looksmaxxing communities can push extreme ideas about appearance, including harmful ones. If your kid is fixated on their jawline or face, ask about it." },
+  { t: "gyatt", p: "gyat", pos: "interj.", who: "za", st: "fading", k: ["gyatt", "gyat", "gyatdamn"],
+    s: "Exclamation at a big butt", m: "An exclamation when seeing someone with a big behind. Short for “goddamn.” Also used as a noun for the body part.",
+    ex: "(Said loudly in a hallway. You don't need an example.)",
+    eq: { b: "A wolf whistle. Va-va-voom!", x: "“Baby Got Back.”", m: "“Thicc.”", z: "Kai Cenat made it famous in 2022." },
+    use: "no", un: "Absolutely not.",
+    warn: "Crude and about other people's bodies. Funny to 11-year-olds, gets kids in trouble at school." },
+  { t: "fanum tax", p: "FAN-um taks", pos: "n.", who: "a", st: "fading", k: ["fanum tax", "fanum taxed", "fanum"],
+    s: "Stealing a bite of someone's food", m: "Taking a bite of a friend's food without asking. From the streamer Fanum, part of Kai Cenat's crew, who did it on camera.",
+    ex: "You left your fries unattended. Fanum tax.",
+    eq: { b: "Mooching.", x: "Dibs!", m: "“Can I just have one bite?”", z: "You watched it happen live on stream." },
+    use: "go", un: "The one Gen Alpha word parents can use well. Take a fry, say “fanum tax.”" },
+  { t: "Ohio", p: "oh-HY-oh", pos: "adj.", who: "a", st: "retired", k: ["ohio", "only in ohio"],
+    s: "Weird, cursed", m: "Weird, cursed, or bizarre, from “only in Ohio” memes. Nothing to do with the actual state.",
+    ex: "A guy on the bus was walking a cat on a leash. So Ohio.",
+    eq: { b: "Something out of the Twilight Zone.", x: "Like it came from Mars.", m: "Florida Man.", z: "Your Florida Man." },
+    use: "maybe", un: "Ohio residents may object." },
+  { t: "crash out", p: "krash owt", pos: "v. / n.", who: "za", st: "fresh", k: ["crash out", "crashed out", "crashing out", "crashout", "crash outs"],
+    s: "Lose it and do something reckless", m: "Lose your temper and do something reckless, or have a meltdown. “A crash out” is someone who does this.",
+    ex: "If they cancel my show I'm going to crash out.",
+    eq: { b: "Blow your top. Flip your lid.", x: "Lose it. Have a cow.", m: "Rage-quit.", z: "Spiraling, but louder." },
+    use: "go", un: "Fair to say: “Don't crash out about the Wi-Fi.”" },
+  { t: "glazing", p: "GLAY-zing", pos: "v.", who: "za", st: "hot", k: ["glazing", "glaze", "glazed", "glazer", "stop glazing"],
+    s: "Over-praising someone", m: "Over-praising someone, sucking up. “Stop glazing” means stop hyping them so much.",
+    ex: "You're glazing that YouTuber like he's your dad.",
+    eq: { b: "Brown-nosing. Buttering up.", x: "Kissing up.", m: "Fanboying. Stanning way too hard." },
+    use: "maybe", un: "Its origins are a bit crude. Most kids don't think about that." },
+  { t: "clanker", p: "KLANG-ker", pos: "n.", who: "za", st: "fresh", k: ["clanker", "clankers"],
+    s: "Mocking word for AI and robots", m: "A mocking name for robots and AI chatbots, borrowed from Star Wars. Became a 2025 joke about AI everywhere.",
+    ex: "I'm not letting a clanker write my essay.",
+    eq: { b: "Tin can. “Danger, Will Robinson!”", x: "Like yelling at a Speak & Spell.", m: "Like cursing out Clippy.", z: "A new one. The “ok boomer” for robots." },
+    use: "go", un: "Safe. The robots won't mind. Probably." },
+  { t: "chopped", p: "chopt", pos: "adj.", who: "za", st: "fresh", k: ["chopped", "chopped up"],
+    s: "Ugly or a mess", m: "Ugly, unattractive, or a mess. A 2025 insult.",
+    ex: "My haircut is so chopped, I'm wearing a hat for a week.",
+    eq: { b: "Homely.", x: "Butt-ugly. Grody.", m: "Busted. A hot mess.", z: "Newer than you. Means busted." },
+    use: "maybe", un: "Fine about yourself. Don't use it about anyone else." },
+  { t: "lock in", p: "lok in", pos: "v.", who: "za", st: "hot", k: ["lock in", "locked in", "locking in", "lock tf in"],
+    s: "Focus hard, get serious", m: "Focus hard and get serious about something. “Locked in” means in the zone.",
+    ex: "Finals are Monday. Time to lock in.",
+    eq: { b: "Buckle down. Nose to the grindstone.", x: "Get your act together.", m: "Beast mode. Grind." },
+    use: "go", un: "Use this one freely. “Lock in on that homework” actually lands." },
+  { t: "fr / ong", p: "eff-ar / ong", pos: "abbr.", who: "za", st: "hot", k: ["fr", "frfr", "ong", "on god", "for real for real"],
+    s: "For real / I swear", m: "“fr” means for real. “ong” means on God, as in I swear. Doubled (“frfr”) for extra emphasis.",
+    ex: "I did my homework fr. Ong.",
+    eq: { b: "Honest to Pete.", x: "Swear to God.", m: "Legit. For reals." },
+    use: "maybe", un: "Fine in a text. Strange out loud." },
+  { t: "chat", p: "chat", pos: "n.", who: "za", st: "hot", k: ["chat", "chat is this real", "chat, is this real"],
+    s: "Talking to friends like a stream audience", m: "Addressing a group, or nobody, as if they're the viewers of a livestream. “Chat, is this real?” is the classic.",
+    ex: "Chat, my mom just said “six seven.” Is this real?",
+    eq: { b: "Like a TV host: “Folks, can you believe this?”", x: "Like Ferris Bueller talking to the camera.", m: "Like a vlogger: “What's up, YouTube.”" },
+    use: "go", un: "“Chat, he's still not up yet” is good parenting content." },
+  { t: "twin", p: "twin", pos: "n.", who: "za", st: "hot", k: ["twin", "twinn", "twizzy"],
+    s: "Close friend", m: "A close friend or someone just like you. Not a literal twin.",
+    ex: "Thanks twin, I owe you.",
+    eq: { b: "Pal. Buddy.", x: "Dude. Homie.", m: "Bestie. Fam." },
+    use: "maybe", un: "Calling your kid “twin” will get a reaction." },
+  { t: "pookie", p: "POO-kee", pos: "n.", who: "za", st: "fading", k: ["pookie", "pookie bear"],
+    s: "Sweetheart", m: "A term of endearment, like sweetheart. Used for friends too.",
+    ex: "Goodnight pookie.",
+    eq: { b: "Honey bunch. Sweetie pie.", x: "Babe.", m: "Bae." },
+    use: "go", un: "Weaponize it in front of their friends. You've earned it." },
+  { t: "opp", p: "op", pos: "n.", who: "za", st: "hot", k: ["opp", "opps"],
+    s: "An enemy or rival", m: "Opponent or enemy. Started in drill rap meaning rival gangs. Kids now mostly use it jokingly for anyone they're feuding with, including siblings and teachers.",
+    ex: "My little brother is the opp.",
+    eq: { b: "The other team. A rival.", x: "A nemesis. “Hello, Newman.”", m: "A hater. A frenemy." },
+    use: "maybe", un: "Fine as a joke about siblings.",
+    warn: "Usually harmless. If it shows up alongside real threats, weapons, or gang talk, take it seriously." },
+  { t: "unalive", p: "un-uh-LYV", pos: "v.", who: "za", st: "hot", k: ["unalive", "unalived", "unaliving", "unalive myself"],
+    s: "Kill or die (filter-dodging)", m: "To kill or die. Invented to get past social-media filters that hide posts with words like “suicide” or “kill.” Often used jokingly.",
+    ex: "If I have to sit through another assembly I'll unalive myself (joking).",
+    eq: { b: "A code word, like spelling words out in front of the kids.", x: "Like bleeping it out.", m: "Censored on purpose." },
+    use: "no", un: "Don't use it casually.",
+    warn: "Even when it's a joke, if your kid says they want to “unalive” themselves, treat it as if they said the real words. In the US, call or text 988 to reach the Suicide & Crisis Lifeline." },
+  { t: "sybau", p: "SY-bow", pos: "abbr.", who: "za", st: "fresh", k: ["sybau", "sybau 💔", "stfu"],
+    s: "A rude “shut up”", m: "Short for “shut your b*tch a** up.” Very rude. Often softened with a 💔 to seem playful.",
+    ex: "sybau 💔",
+    eq: { b: "“Pipe down!”, but much ruder.", x: "“Talk to the hand,” but much ruder.", m: "STFU.", z: "Newer, ruder STFU." },
+    use: "no", un: "No.",
+    warn: "Rude even between friends. If it's aimed at one kid over and over, it can be bullying." },
+  { t: "ijbol", p: "ij-bol", pos: "abbr.", who: "z", st: "fading", k: ["ijbol"],
+    s: "I just burst out laughing", m: "I Just Burst Out Laughing. A newer LOL.",
+    ex: "the dog's face ijbol",
+    eq: { b: "Ha! That's a riot.", x: "LOL.", m: "LMAO." },
+    use: "go", un: "A clean one for texting." },
+  { t: "standing on business", p: "STAN-ding on BIZ-nis", pos: "phr.", who: "za", st: "fading", k: ["standing on business", "stand on business", "on business"],
+    s: "Following through, keeping your word", m: "Following through, backing up what you said, handling things properly.",
+    ex: "I said I'd finish the project and I'm standing on business.",
+    eq: { b: "A man of his word.", x: "Walking the walk.", m: "Adulting." },
+    use: "go", un: "A good value to borrow. “I'm standing on business: no phones at dinner.”" },
+  { t: "tweaking", p: "TWEE-king", pos: "v.", who: "za", st: "hot", k: ["tweaking", "tweakin", "tweakin'", "you're tweaking"],
+    s: "Acting crazy or wrong", m: "Acting crazy or being wrong. “You're tweaking” means you're being ridiculous.",
+    ex: "You think I took your charger? You're tweaking.",
+    eq: { b: "Off your rocker.", x: "Wigging out.", m: "Trippin'." },
+    use: "maybe", un: "Its origin is meth slang. Kids mostly don't know that." },
+  { t: "based", p: "bayst", pos: "adj.", who: "z", st: "fading", k: ["based"],
+    s: "Unapologetically yourself", m: "Unapologetically yourself, or holding a strong opinion people respect.",
+    ex: "He wore crocs to prom. Based.",
+    eq: { b: "Telling it like it is.", x: "Keeping it real.", m: "Real talk." },
+    use: "maybe", un: "Sometimes political online. Usually just means bold." },
+  { t: "yapping", p: "YAP-ing", pos: "v.", who: "za", st: "hot", k: ["yapping", "yap", "yapper", "yappin"],
+    s: "Talking too much", m: "Talking too much, or talking nonsense. “Yapper” is someone who never stops.",
+    ex: "The sub was yapping for 40 minutes.",
+    eq: { b: "Running your mouth. Flapping your gums.", x: "Blah blah blah.", m: "TMI. Rambling." },
+    use: "go", un: "Parent-approved. “Less yapping, more eating.”" },
+  { t: "demure", p: "dih-MYOOR", pos: "adj.", who: "z", st: "retired", k: ["demure", "very demure", "very mindful"],
+    s: "Modest and put-together", m: "Calm, modest, put-together. From a 2024 TikTok trend (“very demure, very mindful”). Mostly retired now.",
+    ex: "I wore sweatpants to the dentist. Very demure.",
+    eq: { b: "Ladylike. Prim and proper.", x: "Classy.", m: "Effortless." },
+    use: "go", un: "It's retired, so you're allowed it now." },
+  { t: "rage bait", p: "rayj bayt", pos: "n.", who: "za", st: "fresh", k: ["rage bait", "ragebait", "rage baiting", "rage-bait"],
+    s: "Posts made to make you mad", m: "Posts designed to make you angry so you'll comment and share. Oxford's Word of the Year for 2025.",
+    ex: "Don't reply, it's rage bait.",
+    eq: { b: "Like a shock jock or tabloid headline.", x: "The Jerry Springer Show.", m: "Trolling. Clickbait.", z: "Clickbait's angrier cousin." },
+    use: "go", un: "Worth teaching. Also good for reading your own feed." },
+  { t: "parasocial", p: "pair-uh-SOH-shul", pos: "adj.", who: "za", st: "fresh", k: ["parasocial", "parasocial relationship"],
+    s: "One-sided bond with a celebrity", m: "A one-sided relationship with a celebrity or streamer who doesn't know you exist. Cambridge Dictionary's Word of the Year for 2025.",
+    ex: "My parasocial relationship with that streamer is out of control.",
+    eq: { b: "Screaming at the Beatles on Ed Sullivan.", x: "Kirk Cameron posters in your locker.", m: "Being a Belieber.", z: "You know exactly which streamer you had this with." },
+    use: "go", un: "A good word to talk about together." },
+  { t: "slop", p: "slop", pos: "n.", who: "za", st: "fresh", k: ["slop", "ai slop"],
+    s: "Low-quality junk content, often AI", m: "Low-quality junk content, especially AI-generated videos and images flooding feeds.",
+    ex: "My feed is all AI slop now.",
+    eq: { b: "Dreck. Schlock.", x: "Filler. Garbage TV.", m: "Content-farm junk.", z: "Brainrot's cheaper cousin." },
+    use: "go", un: "Safe and accurate." }
+];
+
+const SAMPLES = [
+  "bro is lowkey cooked, he said six seven in class and got caught in 4K 💀",
+  "that fit ate fr, main character energy no cap",
+  "stop glazing him, the movie was mid",
+  "chat is this real, unc just said bet",
+  "she's delulu about her situationship, it's giving rage bait"
+];
+
+// ---------- state ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const prefs = Object.assign({ p: "x", k: "a", tab: "decode", f: "all" }, store.get("fik-prefs", {}));
+const savePrefs = () => store.set("fik-prefs", prefs);
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const kidKey = () => prefs.k === "beta" ? "a" : prefs.k;
+const forKid = t => t.who.includes(kidKey());
+const eqFor = t => t.eq[prefs.p] || "Your generation coined this one. You're already fluent.";
+
+function fitNote(t) {
+  const k = kidKey();
+  if (t.who === "a" && k === "z") return "A younger-kid word. If your teen says it, they're being ironic or teasing a sibling.";
+  if (t.who === "z" && k === "a") return "More of an older-teen word. Your kid may know it from older siblings.";
+  return "";
+}
+
+// ---------- setup chips ----------
+function renderChips() {
+  $("#parentChips").innerHTML = Object.entries(GENS).map(([k, g]) =>
+    `<button class="chip" data-p="${k}" aria-pressed="${prefs.p === k}"><b>${g.name}</b><small>${g.yrs}</small></button>`).join("");
+  $("#kidChips").innerHTML = Object.entries(KIDS).map(([k, g]) =>
+    `<button class="chip" data-k="${k}" aria-pressed="${prefs.k === k}"><b>${g.name}</b><small>${g.yrs} · ${g.age}</small></button>`).join("");
+}
+document.addEventListener("click", e => {
+  const c = e.target.closest(".chip");
+  if (!c) return;
+  if (c.dataset.p) prefs.p = c.dataset.p;
+  if (c.dataset.k) prefs.k = c.dataset.k;
+  savePrefs(); renderChips(); renderAll();
+});
+
+// ---------- tabs ----------
+function showTab(name) {
+  prefs.tab = name; savePrefs();
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach(p => p.hidden = p.id !== "p-" + name);
+}
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+// ---------- decoder ----------
+const isWordChar = ch => /[a-z0-9]/i.test(ch || "");
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const MATCHERS = TERMS.flatMap((t, i) => t.k.map(a => {
+  const pre = isWordChar(a[0]) ? "(?<![a-z0-9])" : "";
+  const post = isWordChar(a[a.length - 1]) ? "(?![a-z0-9])" : "";
+  return { a, i, re: new RegExp(pre + reEsc(a.toLowerCase()) + post, "g") };
+})).sort((x, y) => y.a.length - x.a.length);
+
+function findSlang(text) {
+  const low = text.toLowerCase().replace(/[’‘]/g, "'");
+  const taken = new Array(low.length).fill(false);
+  const hits = [];
+  for (const m of MATCHERS) {
+    m.re.lastIndex = 0;
+    let r;
+    while ((r = m.re.exec(low))) {
+      const s = r.index, e = s + r[0].length;
+      if (taken.slice(s, e).some(Boolean)) continue;
+      for (let j = s; j < e; j++) taken[j] = true;
+      hits.push({ s, e, i: m.i });
+    }
+  }
+  return hits.sort((x, y) => x.s - y.s);
+}
+
+function decode() {
+  const text = $("#said").value.trim();
+  const out = $("#out");
+  if (!text) { out.innerHTML = `<p class="nothing">Type something your kid said above, then press Decode.</p>`; return; }
+  const hits = findSlang(text);
+  let html = "", pos = 0;
+  for (const h of hits) {
+    html += esc(text.slice(pos, h.s)) + `<mark data-i="${h.i}" title="${esc(TERMS[h.i].s)}">${esc(text.slice(h.s, h.e))}</mark>`;
+    pos = h.e;
+  }
+  html += esc(text.slice(pos));
+  const uniq = [...new Set(hits.map(h => h.i))];
+  const g = GENS[prefs.p];
+  const list = uniq.length
+    ? uniq.map(i => { const t = TERMS[i]; return `<div class="found-item"><span class="t">${esc(t.t)}</span><div><p>${esc(t.m)}</p><p class="eq"><b>${g.lead}:</b> ${esc(eqFor(t))}</p>${t.warn ? `<p class="alert"><b>Heads-up.</b> ${esc(t.warn)}</p>` : ""}</div></div>`; }).join("")
+    : `<p class="nothing">No words from the phrasebook found. It might be brand-new slang${sampleFn ? ". Ask Claude below." : ", or just a normal sentence."}</p>`;
+  out.innerHTML = `<div class="mono small">You heard</div><div class="heard">${html}</div><div class="found">${list}</div><div class="ai" id="ai" hidden><div class="mono small">Full translation, ${esc(g.name)} edition</div><p class="ai-text" id="aiText"></p><p class="small" id="aiNote"></p></div>`;
+}
+$("#decodeBtn").addEventListener("click", decode);
+$("#said").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) decode(); });
+$("#out").addEventListener("click", e => {
+  const m = e.target.closest("mark");
+  if (!m) return;
+  showTab("book"); $("#q").value = TERMS[m.dataset.i].t; renderBook();
+});
+$("#samples").insertAdjacentHTML("beforeend", SAMPLES.map(s => `<button type="button">${esc(s)}</button>`).join(""));
+$("#samples").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  $("#said").value = b.textContent; decode();
+});
+
+// ---------- Ask Claude (sample capability) ----------
+let sampleFn = null, ctl = null;
+const AI_ERRORS = {
+  not_granted: "Claude lookups weren't allowed for this page, so this button is hidden.",
+  sampling_disabled: "Claude isn't available on this account.",
+  rate_limited: "Too many lookups at once. Give it a minute and try again.",
+  session_expired: "Your Claude session expired. Sign in again to use lookups.",
+  refused: "Claude wouldn't translate that one. Try rephrasing it.",
+  empty_completion: "Claude came back empty. Try a shorter phrase."
+};
+const HIDE_CODES = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+
+function fmtAI(t) {
+  return esc(t).replace(/^(PLAIN ENGLISH|IN YOUR DAY|WORD BY WORD|HEADS-UP):?/gm, '<span class="lbl">$1</span>\n');
+}
+
+async function askClaude() {
+  const text = $("#said").value.trim();
+  if (!text || !sampleFn) return;
+  decode();
+  const g = GENS[prefs.p], k = KIDS[prefs.k];
+  const ai = $("#ai"), aiText = $("#aiText"), note = $("#aiNote");
+  ai.hidden = false; aiText.textContent = "Thinking…"; note.textContent = "";
+  $("#askBtn").disabled = true; $("#stopBtn").hidden = false;
+  ctl = new AbortController();
+  const prompt = `You explain kids' slang to parents in a warm, plain way.
+Parent: ${g.name} (${g.yrs}), who was a teenager around ${g.teen}.
+Kid: ${k.name} (${k.yrs}).
+Today is October 2026.
+The parent heard their kid say or text this:
+"""${text.slice(0, 2000)}"""
+
+Reply in plain text with no markdown symbols, under 170 words, in exactly this shape:
+PLAIN ENGLISH: one or two sentences on what the kid meant.
+IN YOUR DAY: the same message rewritten the way a ${g.name} teenager around ${g.teen} would have said it, using real slang from that time.
+WORD BY WORD: one line per slang term or emoji, written "term - meaning".
+HEADS-UP: include this line only if something touches on self-harm, drugs, sex, violence, or bullying. Be calm and practical. Otherwise leave it out entirely.
+If a word is newer than you know, or you are unsure, say so plainly instead of guessing.`;
+  try {
+    const r = await sampleFn(prompt, { signal: ctl.signal, onText: ({ text }) => { aiText.innerHTML = fmtAI(text); } });
+    if (r.truncated) note.textContent = "Cut short. Try a shorter message.";
+  } catch (e) {
+    aiText.innerHTML = e.text ? fmtAI(e.text) : "";
+    if (e.code === "cancelled") note.textContent = "Stopped.";
+    else if (HIDE_CODES.includes(e.code)) { note.textContent = AI_ERRORS[e.code] || "Claude lookups aren't available here."; sampleFn = null; $("#askBtn").hidden = true; }
+    else note.textContent = AI_ERRORS[e.code] || "Something went wrong reaching Claude. Try again in a moment.";
+    if (!aiText.textContent) aiText.hidden = true; else aiText.hidden = false;
+  } finally {
+    $("#askBtn").disabled = false; $("#stopBtn").hidden = true;
+  }
+}
+$("#askBtn").addEventListener("click", askClaude);
+$("#stopBtn").addEventListener("click", () => ctl?.abort());
+
+(async () => {
+  try {
+    if (window.claude && window.claude.use) sampleFn = await window.claude.use("sample");
+  } catch { sampleFn = null; }
+  $("#askBtn").hidden = !sampleFn;
+})();
+
+// ---------- phrasebook ----------
+document.querySelectorAll(".filter").forEach(b => b.addEventListener("click", () => {
+  prefs.f = b.dataset.f; savePrefs();
+  document.querySelectorAll(".filter").forEach(x => x.setAttribute("aria-pressed", x.dataset.f === prefs.f));
+  renderBook();
+}));
+$("#q").addEventListener("input", renderBook);
+
+function entryHTML(t) {
+  const g = GENS[prefs.p], fit = fitNote(t);
+  return `<article class="entry">
+    <div class="entry-head"><h3>${esc(t.t)}</h3><span class="pron">[${esc(t.p)}]</span><span class="pos">${esc(t.pos)}</span><span class="pill ${t.st}">${STATUS[t.st]}</span></div>
+    <p>${esc(t.m)}</p>
+    <p class="says">${esc(t.ex)}</p>
+    <p class="then"><span class="k">${esc(g.lead)}</span><span class="v">${esc(eqFor(t))}</span></p>
+    ${fit ? `<p class="fit">${esc(fit)}</p>` : ""}
+    ${t.warn ? `<p class="alert"><b>Heads-up.</b> ${esc(t.warn)}</p>` : ""}
+    <div class="meter ${t.use}"><span class="dot"></span><span><b>Should you say it? ${USE[t.use]}</b> ${esc(t.un)}</span></div>
+  </article>`;
+}
+
+function renderBook() {
+  document.querySelectorAll(".filter").forEach(x => x.setAttribute("aria-pressed", x.dataset.f === prefs.f));
+  const q = $("#q").value.trim().toLowerCase();
+  let list = TERMS.filter(forKid);
+  if (prefs.f === "fresh") list = list.filter(t => t.st === "fresh");
+  if (prefs.f === "alert") list = list.filter(t => t.warn);
+  if (prefs.f === "safe") list = list.filter(t => t.use === "go");
+  if (q) list = TERMS.filter(t => (t.t + " " + t.k.join(" ") + " " + t.m).toLowerCase().includes(q));
+  const order = { fresh: 0, hot: 1, fading: 2, retired: 3 };
+  list.sort((a, b) => order[a.st] - order[b.st]);
+  $("#count").textContent = `${list.length} ${list.length === 1 ? "entry" : "entries"}`;
+  const k = KIDS[prefs.k];
+  $("#eraBanner").innerHTML = prefs.k === "beta"
+    ? `<div class="banner"><b>Gen Beta is still working on “ba-ba.”</b> Their slang hasn't been invented yet. Below is what their older siblings and cousins say, which is what will reach them first.</div>`
+    : q ? `<div class="banner">Searching every generation's words for “${esc(q)}”.</div>`
+    : `<div class="banner">Showing words <b>${esc(k.name)}</b> kids use, explained for a <b>${esc(GENS[prefs.p].name)}</b>.</div>`;
+  $("#grid").innerHTML = list.length ? list.map(entryHTML).join("")
+    : `<p class="empty">Nothing matches. If you heard it recently, it may be brand-new. Try the Decoder, or save it under Words I heard.</p>`;
+}
+
+// ---------- quiz ----------
+let quiz = null;
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function newQuiz() {
+  const pool = TERMS.filter(forKid);
+  const qs = shuffle(pool).slice(0, 5).map(t => ({ t, opts: shuffle([t, ...shuffle(TERMS.filter(x => x !== t)).slice(0, 3)]) }));
+  quiz = { qs, n: 0, score: 0, picked: null };
+  renderQuiz();
+}
+function renderQuiz() {
+  const el = $("#quiz");
+  if (!quiz) return newQuiz();
+  if (quiz.n >= quiz.qs.length) {
+    const s = quiz.score;
+    const [title, msg] = s <= 1 ? ["Certified unc.", "No shame. Read the phrasebook and try again."]
+      : s <= 3 ? ["Lowkey learning.", "You'd survive a car ride. Barely."]
+      : s === 4 ? ["Nearly fluent.", "Your kid will be suspicious. In a good way."]
+      : ["You ate. No crumbs.", "Your kid is now deeply uncomfortable."];
+    el.innerHTML = `<div class="qcard"><div class="q mono">Final score</div><div class="score">${s}/5</div><h3 style="font-size:26px">${title}</h3><p style="margin:0">${msg}</p><div class="row"><button class="btn" id="again">New quiz</button></div></div>`;
+    $("#again").onclick = newQuiz;
+    return;
+  }
+  const { t, opts } = quiz.qs[quiz.n];
+  const done = quiz.picked !== null;
+  el.innerHTML = `<div class="qbar"><span>Question ${quiz.n + 1} of 5</span><span>Score ${quiz.score}</span></div>
+    <div class="qcard"><div class="q mono">Your kid says</div><div class="qt">${esc(t.t)}</div><p class="qs" style="margin:0">“${esc(t.ex)}”</p>
+    <div class="q mono">What does it mean?</div>
+    <div class="opts">${opts.map((o, i) => {
+      let cls = "opt";
+      if (done && o === t) cls += " right";
+      else if (done && i === quiz.picked) cls += " wrong";
+      return `<button class="${cls}" data-o="${i}" ${done ? "disabled" : ""}>${esc(o.s)}</button>`;
+    }).join("")}</div>
+    ${done ? `<p style="margin:0"><b>${opts[quiz.picked] === t ? "Correct." : "Not quite."}</b> ${esc(GENS[prefs.p].lead)}: <span style="background:linear-gradient(transparent 50%, var(--mark) 50%)">${esc(eqFor(t))}</span></p><div class="row"><button class="btn" id="next">${quiz.n === 4 ? "See score" : "Next word"}</button></div>` : ""}
+    </div>`;
+  el.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    quiz.picked = +b.dataset.o;
+    if (opts[quiz.picked] === t) quiz.score++;
+    renderQuiz();
+  });
+  const nx = $("#next"); if (nx) nx.onclick = () => { quiz.n++; quiz.picked = null; renderQuiz(); };
+}
+
+// ---------- notes ----------
+let notes = store.get("fik-notes", [
+  { t: "huzz", m: "Example note: heard it in the car about some girls at the mall", ex: true }
+]);
+function renderNotes() {
+  $("#notes").innerHTML = notes.length ? notes.map((n, i) => `<div class="note"><b>${esc(n.t)}</b><span>${esc(n.m || "No notes")}</span><span class="acts"><button class="linkbtn" data-dec="${i}">Decode it</button><button class="linkbtn" data-del="${i}">Remove</button></span></div>`).join("")
+    : `<p class="empty">No words saved yet. The next time you hear one you don't know, add it above.</p>`;
+}
+$("#noteForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = $("#nt").value.trim(); if (!t) return;
+  notes = notes.filter(n => !n.ex);
+  notes.unshift({ t, m: $("#nm").value.trim() });
+  store.set("fik-notes", notes);
+  $("#nt").value = ""; $("#nm").value = ""; renderNotes();
+});
+$("#notes").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.del != null) { notes.splice(+b.dataset.del, 1); store.set("fik-notes", notes); renderNotes(); }
+  if (b.dataset.dec != null) { $("#said").value = notes[+b.dataset.dec].t; showTab("decode"); decode(); $("#said").focus(); }
+});
+
+// ---------- boot ----------
+function renderAll() { decode(); renderBook(); quiz = null; renderQuiz(); }
+renderChips();
+$("#said").value = SAMPLES[0];
+renderAll();
+renderNotes();
+showTab(prefs.tab);
+</script>
